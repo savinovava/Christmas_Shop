@@ -1,14 +1,5 @@
 {
-  "cart": [
-    {
-      "id": 3,
-      "quantity": 2
-    },
-    {
-      "id": 1,
-      "quantity": 3
-    }
-  ],
+  "cart": [],
   "items": [
     {
       "id": 1,

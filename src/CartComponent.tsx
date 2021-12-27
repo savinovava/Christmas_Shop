@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {CartItem} from "./CartItem";
+import {CartItem, cartItemFromShopItem} from "./CartItem";
 import {Button, Col, Container, Row} from "react-bootstrap";
 import {cartService} from "./CartService";
 import {CartItemComponent} from "./CartItemComponent";
@@ -17,7 +17,9 @@ interface CartComponentState {
     // Полная цена корины
     fullPrice: number;
 }
-
+function deleteFromCart(id: number) {
+    cartService.deleteCartItem(id);
+}
 /**
  * Компонента с корзиной.
  */
@@ -82,10 +84,14 @@ export function CartComponent() {
                         return (
                             <Col xs={3}>
                                 <CartItemComponent cartItem={item}/>
+                                <div className="delete-from-cart"><Button onClick={() => deleteFromCart(item.id)} variant="danger">Удалить из корзины</Button></div>
                             </Col>
                         );
                     })
                 }
+            </Row>
+            <Row>
+                <h6></h6>
             </Row>
             {/*Просто кнопка-заглушка*/}
             <Button variant="success">Оплатить</Button>

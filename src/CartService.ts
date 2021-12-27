@@ -8,6 +8,10 @@ interface CartService {
 
     // Добавить в корзину новый товар
     addCartItem(newCartItem: CartItem): Promise<void>;
+
+    //Удаление товара из корзины
+    deleteCartItem(curCartID:number):Promise<void>;
+
 }
 
 // Реализация сервиса корзины с JSON-server
@@ -61,9 +65,40 @@ class ServerCartService implements CartService {
         return;
     }
 
+    async deleteCartItem(curCartID: number): Promise<void> {
+        // Достаём корзину с сервера
+        let currentCart = await this.getCart();
+
+        // Достаём элемент корзины с таким же ID что и пытаемся добавить в корзину
+        let existingItem = currentCart.find(value => value.id === curCartID);
+
+        // Если там такой элемент есть (то мы будем его менять)
+        let hasItem: boolean = existingItem != null;
+
+        // То нам надо указать этот ID в URL-адресе, для изменения данных
+        // Это то как обычно работает REST-протокол и JSON-server
+        let url: string = hasItem ? `${DATA_URL}/cart/${curCartID}` : `${DATA_URL}/cart`;
+
+        let method: string = 'DELETE';
+
+        if (existingItem != null) {
+            // Если он есть, то удаляем элемент из корзины
+            currentCart.splice(curCartID,1)
+        }
+
+        await fetch(url, {
+            method: method,
+            headers: {
+                'content-type': 'application/json;charset=UTF-8',
+            },
+            body: JSON.stringify(existingItem)
+        });
+        return;
+    }
+
 }
 
-class BrowserCartService implements CartService {
+/*class BrowserCartService implements CartService {
 
     static CART_KEY = "cart";
 
@@ -105,7 +140,28 @@ class BrowserCartService implements CartService {
         return Promise.resolve();
     }
 
-}
+    async deleteCartItem(curCartItem: number): Promise<void> {
+        // Получим корзину
+        let cart: CartItem[] = await this.getCart();
+
+        // Найдём в ней элемент по id того, который хотим добавить
+        let existingItem = cart.find(value => value.id === curCartItem.id);
+
+        if (existingItem != null) {
+            // Если он есть, то удаляем элемент из корзины
+            cart.splice(cart.indexOf(curCartItem),1)
+        }
+
+        // Превращаем список в JSON строку
+        let jsonCart = JSON.stringify(cart);
+
+        // Записываем в local storage
+        localStorage.setItem(BrowserCartService.CART_KEY, jsonCart);
+
+        return Promise.resolve();
+    }
+
+}*/
 
 // Используем серверную корзину
 export const cartService = new ServerCartService();
