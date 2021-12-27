@@ -17,9 +17,6 @@ interface CartComponentState {
     // Полная цена корины
     fullPrice: number;
 }
-function deleteFromCart(id: number) {
-    cartService.deleteCartItem(id);
-}
 /**
  * Компонента с корзиной.
  */
@@ -30,6 +27,16 @@ export function CartComponent() {
         cartItems: [],
         fullPrice: 0
     });
+
+    async function deleteFromCart(deletedItem: CartItem) {
+            let shopItemPromise: Promise<ShopItem> = DataServiceInstance.getItem(deletedItem.id);
+            let shopItem = await shopItemPromise;
+        changeState({
+            cartItems: state.cartItems.filter (item => item.id != deletedItem.id ),
+            fullPrice: state.fullPrice - shopItem.price * deletedItem.quantity
+        })
+        await cartService.deleteCartItem(deletedItem.id);
+    }
 
     // useEffect -- выполняется "один раз" на каждое изменение второго аргумента этой функции
     // здесь это [] то есть пустой массив. Получается, функция, которая загружает данные выполнится один раз
@@ -84,7 +91,7 @@ export function CartComponent() {
                         return (
                             <Col xs={3}>
                                 <CartItemComponent cartItem={item}/>
-                                <div className="delete-from-cart"><Button onClick={() => deleteFromCart(item.id)} variant="danger">Удалить из корзины</Button></div>
+                                <div className="delete-from-cart"><Button onClick={() => deleteFromCart(item)} variant="danger">Удалить из корзины</Button></div>
                             </Col>
                         );
                     })

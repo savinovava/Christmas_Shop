@@ -83,7 +83,7 @@ class ServerCartService implements CartService {
 
         if (existingItem != null) {
             // Если он есть, то удаляем элемент из корзины
-            currentCart.splice(curCartID,1)
+            currentCart.splice(curCartID, 1)
         }
 
         await fetch(url, {
